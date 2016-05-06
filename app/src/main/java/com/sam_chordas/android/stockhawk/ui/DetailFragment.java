@@ -40,8 +40,8 @@ import lecho.lib.hellocharts.view.LineChartView;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int CURSOR_LOADER_ID = 8001;
-    @BindView(R.id.detail_text_view_symbol)
-    TextView vSymbol;
+//    @BindView(R.id.detail_text_view_symbol)
+//    TextView vSymbol;
 
     private Unbinder unbinder;
     private String mSymbol;
