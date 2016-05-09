@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
@@ -20,10 +19,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Line;
@@ -40,6 +36,7 @@ import lecho.lib.hellocharts.view.LineChartView;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int CURSOR_LOADER_ID = 8001;
+    private static final String TAG = "DetailFragment";
 //    @BindView(R.id.detail_text_view_symbol)
 //    TextView vSymbol;
 
@@ -113,17 +110,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         List<PointValue> yValues = new ArrayList<PointValue>();
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
 
+        int countX = 0;
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         try {
             while (mCursor.moveToNext()) {
                 float y = decimalFormat.parse(mCursor.getString(mCursor.getColumnIndex(QuoteColumns.BIDPRICE))).floatValue();
                 long x = mCursor.getLong(mCursor.getColumnIndex(QuoteColumns.CREATED));
 
-                yValues.add(new PointValue(x, y));
+                Log.d(TAG, "x " + x + ", y " + y);
+                yValues.add(new PointValue(++countX, y));
                 AxisValue axisValue = new AxisValue(x);
                 axisValues.add(axisValue);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Log.d(DetailFragment.class.getSimpleName(), ex.getMessage(), ex);
         }
 
@@ -133,15 +132,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         line.setShape(shape);
         line.setCubic(isCubic);
         line.setFilled(isFilled);
-        line.setHasLabels(hasLabels);
+//        line.setHasLabels(false);
         line.setHasLabelsOnlyForSelected(hasLabelForSelected);
         line.setHasLines(hasLines);
-        line.setHasPoints(hasPoints);
+        line.setHasPoints(false);
         lines.add(line);
 
         data = new LineChartData(lines);
-        data.setAxisXBottom(new Axis(axisValues));
-        data.setAxisXBottom(null);
+        data.setAxisXBottom(new Axis(axisValues).setHasSeparationLine(false));
+//        data.setAxisXBottom(null);
         data.setAxisYLeft(null);
         data.setBaseValue(Float.NEGATIVE_INFINITY);
 
@@ -163,8 +162,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return new CursorLoader(getContext(), QuoteProvider.Quotes.CONTENT_URI,
                 new String[]{QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE,
                         QuoteColumns.PERCENT_CHANGE, QuoteColumns.CHANGE, QuoteColumns.ISUP, QuoteColumns.CREATED},
-                QuoteColumns.ISCURRENT + " = ?",
-                new String[]{"1"},
+                QuoteColumns.SYMBOL + " = ?",
+                new String[]{mSymbol},
                 null);
     }
 

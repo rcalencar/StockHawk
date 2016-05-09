@@ -12,6 +12,12 @@
     <lecho.lib.hellocharts.view.LineChartView
         android:id="@+id/detail_chart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="200dp" />
+    
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/detail_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>
