@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+import com.sam_chordas.android.stockhawk.rest.DetailCursorRecyclerViewAdapter;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -37,8 +40,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static final int CURSOR_LOADER_ID = 8001;
     private static final String TAG = "DetailFragment";
-//    @BindView(R.id.detail_text_view_symbol)
-//    TextView vSymbol;
+    public static final int MINIMUM_TO_DRAW = 4;
 
     private Unbinder unbinder;
     private String mSymbol;
@@ -57,6 +59,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private boolean isCubic = false;
     private boolean hasLabelForSelected = false;
     private boolean pointsHaveDifferentColor;
+    private RecyclerView recyclerView;
+    private DetailCursorRecyclerViewAdapter mCursorAdapter;
+    private View noChart;
 
     public DetailFragment() {
     }
@@ -76,8 +81,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (getArguments() != null) {
             mSymbol = getArguments().getString("symbol");
         }
-
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
 
     @Override
@@ -85,12 +88,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-//        unbinder = ButterKnife.bind(this, rootView);
-//        vSymbol.setText(mSymbol);
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+
+        noChart = rootView.findViewById(R.id.detail_no_chart);
 
         chart = (LineChartView) rootView.findViewById(R.id.detail_chart);
 //        chart.setViewportCalculationEnabled(false);
 //        resetViewport();
+
+        mCursorAdapter = new DetailCursorRecyclerViewAdapter(getContext(), null);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.detail_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(mCursorAdapter);
 
         return rootView;
     }
@@ -106,7 +115,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         chart.setCurrentViewport(v);
     }
 
-    private void generateData() {
+    private void generateChart() {
         List<PointValue> yValues = new ArrayList<PointValue>();
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
 
@@ -170,11 +179,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCursor = data;
-        generateData();
+
+        if(data.getCount() >= MINIMUM_TO_DRAW) {
+            chart.setVisibility(View.VISIBLE);
+            noChart.setVisibility(View.GONE);
+            generateChart();
+        } else {
+            chart.setVisibility(View.GONE);
+            noChart.setVisibility(View.VISIBLE);
+        }
+
+        data.moveToPosition(-1);
+        mCursorAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mCursor = null;
+        mCursorAdapter.swapCursor(null);
     }
 }

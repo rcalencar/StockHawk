@@ -17,4 +17,7 @@
     <string name="text_view_change">Change</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_detail">Detail</string>
+    <string name="symbol_not_added">Ops! Symbol not found. Please try again.</string>
+    <string name="no_internet_connection">No internet connection. Your quotes might be out of date.</string>
+    <string name="not_enough_data">Not enough data to render you a chart.</string>
 </resources>

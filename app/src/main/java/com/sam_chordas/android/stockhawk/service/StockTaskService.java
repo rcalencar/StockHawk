@@ -21,6 +21,7 @@ import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 /**
  * Created by sam_chordas on 9/30/15.
@@ -117,7 +118,7 @@ public class StockTaskService extends GcmTaskService {
             try {
                 Log.d(this.getClass().getSimpleName(), urlString);
                 getResponse = fetchData(urlString);
-                result = GcmNetworkManager.RESULT_SUCCESS;
+
                 try {
                     ContentValues contentValues = new ContentValues();
                     // update ISCURRENT to 0 (false) so new data is current
@@ -126,8 +127,11 @@ public class StockTaskService extends GcmTaskService {
                         mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
                                 null, null);
                     }
-                    mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
-                            Utils.quoteJsonToContentVals(getResponse));
+                    ArrayList vals = Utils.quoteJsonToContentVals(getResponse);
+                    if (vals != null && vals.size() > 0) {
+                        result = GcmNetworkManager.RESULT_SUCCESS;
+                        mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY, vals);
+                    }
                 } catch (RemoteException | OperationApplicationException e) {
                     Log.e(LOG_TAG, "Error applying batch insert", e);
                 }
