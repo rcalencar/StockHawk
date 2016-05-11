@@ -20,8 +20,11 @@ import java.util.Date;
  */
 public class DetailCursorRecyclerViewAdapter extends CursorRecyclerViewAdapterAbstract<DetailCursorRecyclerViewAdapter.ViewHolder> {
 
+    private Context context;
+
     public DetailCursorRecyclerViewAdapter(Context context, Cursor cursor) {
         super(context, cursor);
+        this.context = context;
     }
 
     @Override
@@ -38,6 +41,7 @@ public class DetailCursorRecyclerViewAdapter extends CursorRecyclerViewAdapterAb
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
+        int isUp = cursor.getInt(cursor.getColumnIndex(QuoteColumns.ISUP));
         long time = Long.parseLong(cursor.getString(cursor.getColumnIndex(QuoteColumns.CREATED)));
         Date date = new Date();
         date.setTime(time);
@@ -47,6 +51,11 @@ public class DetailCursorRecyclerViewAdapter extends CursorRecyclerViewAdapterAb
         viewHolder.date.setText(dt);
         viewHolder.price.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.BIDPRICE)));
         viewHolder.percentage.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.PERCENT_CHANGE)));
+        if(isUp == 1) {
+            viewHolder.percentage.setTextColor(context.getResources().getColor(android.R.color.holo_green_light));
+        } else {
+            viewHolder.percentage.setTextColor(context.getResources().getColor(android.R.color.holo_red_light));
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
