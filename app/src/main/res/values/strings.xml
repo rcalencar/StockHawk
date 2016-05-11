@@ -22,4 +22,7 @@
     <string name="not_enough_data">Not enough data to render you a chart.</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="stock_is_saved">This stock is already saved!</string>
+    <string name="add_widget">Add widget</string>
+    <string name="widget_label">StockHawk</string>
+    <string name="widget_empty_list">Add quotes to keep yourself up to date.</string>
 </resources>

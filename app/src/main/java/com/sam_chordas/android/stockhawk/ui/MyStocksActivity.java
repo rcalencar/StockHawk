@@ -122,7 +122,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             public void onClick(DialogInterface dialogInterface, int whichButton) {
                 Dialog dialog  = (Dialog) dialogInterface;
                 EditText editText = (EditText) dialog.findViewById(R.id.input_dialog);
-                addSymbol(editText.getText().toString());
+                addSymbol(editText.getText().toString().toUpperCase());
             }
         });
         newFragment.show(getSupportFragmentManager(), DIALOG_FRAGMENT_NAME);
@@ -143,7 +143,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     @Override
     protected void onPause() {
         super.onPause();
-        GcmNetworkManager.getInstance(this).cancelTask(PERIODIC_TAG, StockTaskService.class);
+//        GcmNetworkManager.getInstance(this).cancelTask(PERIODIC_TAG, StockTaskService.class);
 
         if (connectivityStatusReceiver != null) {
             unregisterReceiver(connectivityStatusReceiver);
