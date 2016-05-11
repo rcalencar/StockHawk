@@ -15,6 +15,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import lecho.lib.hellocharts.util.ChartUtils;
+
 /**
  * Created by rodrigo.alencar on 5/9/16.
  */
@@ -50,6 +52,7 @@ public class DetailCursorRecyclerViewAdapter extends CursorRecyclerViewAdapterAb
 
         viewHolder.date.setText(dt);
         viewHolder.price.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.BIDPRICE)));
+        viewHolder.price.setTextColor(ChartUtils.COLOR_BLUE);
         viewHolder.percentage.setText(cursor.getString(cursor.getColumnIndex(QuoteColumns.PERCENT_CHANGE)));
         if(isUp == 1) {
             viewHolder.percentage.setTextColor(context.getResources().getColor(android.R.color.holo_green_light));

@@ -141,11 +141,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mCursor = data;
 
         if(data.getCount() >= MINIMUM_TO_DRAW) {
-            chart.setVisibility(View.VISIBLE);
+//            chart.setVisibility(View.VISIBLE);
             noChart.setVisibility(View.GONE);
             generateChart();
         } else {
-            chart.setVisibility(View.GONE);
+//            chart.setVisibility(View.GONE);
             noChart.setVisibility(View.VISIBLE);
         }
 
