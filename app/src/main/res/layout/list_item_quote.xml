@@ -30,8 +30,8 @@
             style="@style/BidPriceTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="10sp"
-            android:paddingEnd="10sp"
+            android:paddingRight="10dp"
+            android:paddingEnd="10dp"
             android:contentDescription="@string/text_view_bid_price"
             tools:text="1000.00" />
 
@@ -41,10 +41,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/percent_change_pill"
-            android:paddingLeft="3dp"
-            android:paddingStart="3dp"
-            android:paddingRight="3dp"
-            android:paddingEnd="3dp"
+            android:paddingLeft="@dimen/percent_change_pill_padding"
+            android:paddingStart="@dimen/percent_change_pill_padding"
+            android:paddingRight="@dimen/percent_change_pill_padding"
+            android:paddingEnd="@dimen/percent_change_pill_padding"
             android:contentDescription="@string/text_view_change"
             tools:text="100%" />
     </LinearLayout>

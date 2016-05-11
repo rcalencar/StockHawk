@@ -1,5 +1,6 @@
 package com.sam_chordas.android.stockhawk.service;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -129,7 +130,7 @@ public class StockTaskService extends GcmTaskService {
                         mContext.getContentResolver().update(QuoteProvider.Quotes.CONTENT_URI, contentValues,
                                 null, null);
                     }
-                    ArrayList vals = Utils.quoteJsonToContentVals(getResponse);
+                    ArrayList<ContentProviderOperation> vals = Utils.quoteJsonToContentVals(getResponse);
                     if (vals != null && vals.size() > 0) {
                         result = GcmNetworkManager.RESULT_SUCCESS;
                         mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY, vals);
