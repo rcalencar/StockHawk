@@ -13,7 +13,7 @@
     <string name="text_view_change">Change</string>
     <string name="symbol_not_added">Ops! Symbol not found. Please try again.</string>
     <string name="no_internet_connection">No internet connection. Your quotes might be out of date.</string>
-    <string name="not_enough_data">Not enough data to render you a chart.</string>
+    <string name="not_enough_data">Not enough data to render you a chart. Please, wait until we have +4 entries.</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="stock_is_saved">This stock is already saved!</string>
     <string name="add_widget">Add widget</string>
