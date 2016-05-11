@@ -62,7 +62,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mSymbol = getArguments().getString("symbol");
+            mSymbol = getArguments().getString(getResources().getString(R.string.par_symbol));
         }
     }
 
