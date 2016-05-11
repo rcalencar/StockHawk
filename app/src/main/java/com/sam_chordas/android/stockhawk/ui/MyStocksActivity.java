@@ -1,26 +1,28 @@
 package com.sam_chordas.android.stockhawk.ui;
 
+import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.InputType;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
@@ -37,9 +39,11 @@ import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.SimpleItemTouchHelperCallback;
 
 public class MyStocksActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, ConnectivityStatusReceiver.Listener {
-    private String PERIODIC_TAG = "periodic";
 
+    private static final String PERIODIC_TAG = "periodic";
+    private static final String DIALOG_FRAGMENT_NAME = "dialog_fragment_name";
     private static final int CURSOR_LOADER_ID = 0;
+
     private QuoteCursorAdapter mCursorAdapter;
     private Cursor mCursor;
     private TextView noInternet;
@@ -78,38 +82,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             @Override
             public void onClick(View v) {
                 if (isConnected) {
-                    new MaterialDialog.Builder(MyStocksActivity.this).title(R.string.symbol_search)
-                            .content(R.string.content_test)
-                            .inputType(InputType.TYPE_CLASS_TEXT)
-                            .input(R.string.input_hint, R.string.input_prefill, new MaterialDialog.InputCallback() {
-                                @Override
-                                public void onInput(MaterialDialog dialog, CharSequence _input) {
-                                    // On FAB click, receive user input. Make sure the stock doesn't already exist
-                                    // in the DB and proceed accordingly
-                                    String symbol = _input.toString().toUpperCase();
-                                    Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
-                                            new String[]{QuoteColumns.SYMBOL}, QuoteColumns.SYMBOL + "= ?",
-                                            new String[]{symbol}, null);
-                                    if (c != null && c.getCount() != 0) {
-                                        Toast toast =
-                                                Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
-                                                        Toast.LENGTH_LONG);
-                                        toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
-                                        toast.show();
-                                        return;
-                                    } else {
-                                        // Add the stock to DB
-                                        Intent serviceIntent = new Intent(MyStocksActivity.this, StockIntentService.class);
-                                        serviceIntent.putExtra("tag", "add");
-                                        serviceIntent.putExtra("symbol", symbol);
-                                        startService(serviceIntent);
-                                    }
-                                    if(c != null) {
-                                        c.close();
-                                    }
-                                }
-                            })
-                            .show();
+                    showDialogInput(getString(R.string.content_test));
                 } else {
                     networkToast();
                 }
@@ -119,6 +92,40 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    private void addSymbol(String symbol) {
+        Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
+                new String[]{QuoteColumns.SYMBOL}, QuoteColumns.SYMBOL + "= ?",
+                new String[]{symbol}, null);
+        if (c != null && c.getCount() != 0) {
+            Toast toast =
+                    Toast.makeText(MyStocksActivity.this, getString(R.string.stock_is_saved),
+                            Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
+            toast.show();
+            return;
+        } else {
+            // Add the stock to DB
+            Intent serviceIntent = new Intent(MyStocksActivity.this, StockIntentService.class);
+            serviceIntent.putExtra("tag", "add");
+            serviceIntent.putExtra("symbol", symbol);
+            startService(serviceIntent);
+        }
+        if(c != null) {
+            c.close();
+        }
+    }
+
+    public void showDialogInput(String text) {
+        final DialogFragment newFragment = AlertDialogFragment.newInstance(text, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int whichButton) {
+                Dialog dialog  = (Dialog) dialogInterface;
+                EditText editText = (EditText) dialog.findViewById(R.id.input_dialog);
+                addSymbol(editText.getText().toString());
+            }
+        });
+        newFragment.show(getSupportFragmentManager(), DIALOG_FRAGMENT_NAME);
     }
 
     @Override
@@ -197,7 +204,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     }
 
     @Override
-    public void status(boolean connected) {
+    public void updateConnectivityStatus(boolean connected) {
         isConnected = connected;
 
         noInternet.setVisibility(isConnected ? View.GONE : View.VISIBLE);

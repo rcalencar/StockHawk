@@ -22,14 +22,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Unbinder;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
-import lecho.lib.hellocharts.model.ValueShape;
-import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.LineChartView;
 
@@ -42,24 +39,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static final String TAG = "DetailFragment";
     public static final int MINIMUM_TO_DRAW = 4;
 
-    private Unbinder unbinder;
     private String mSymbol;
     private LineChartView chart;
-    private int numberOfPoints;
-    private LineChartData data;
     private Cursor mCursor;
 
-    private boolean hasAxes = true;
-    private boolean hasAxesNames = true;
-    private boolean hasLines = true;
-    private boolean hasPoints = true;
-    private ValueShape shape = ValueShape.CIRCLE;
-    private boolean isFilled = false;
-    private boolean hasLabels = false;
-    private boolean isCubic = false;
-    private boolean hasLabelForSelected = false;
-    private boolean pointsHaveDifferentColor;
-    private RecyclerView recyclerView;
     private DetailCursorRecyclerViewAdapter mCursorAdapter;
     private View noChart;
 
@@ -91,28 +74,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
         noChart = rootView.findViewById(R.id.detail_no_chart);
-
         chart = (LineChartView) rootView.findViewById(R.id.detail_chart);
-//        chart.setViewportCalculationEnabled(false);
-//        resetViewport();
+
 
         mCursorAdapter = new DetailCursorRecyclerViewAdapter(getContext(), null);
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.detail_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.detail_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mCursorAdapter);
 
         return rootView;
-    }
-
-    private void resetViewport() {
-        // Reset viewport height range to (0,100)
-        final Viewport v = new Viewport(chart.getMaximumViewport());
-        v.bottom = 0;
-        v.top = 100;
-        v.left = 0;
-        v.right = numberOfPoints - 1;
-        chart.setMaximumViewport(v);
-        chart.setCurrentViewport(v);
     }
 
     private void generateChart() {
@@ -125,8 +95,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             while (mCursor.moveToNext()) {
                 float y = decimalFormat.parse(mCursor.getString(mCursor.getColumnIndex(QuoteColumns.BIDPRICE))).floatValue();
                 long x = mCursor.getLong(mCursor.getColumnIndex(QuoteColumns.CREATED));
-
-                Log.d(TAG, "x " + x + ", y " + y);
+//                Log.d(TAG, "x " + x + ", y " + y);
                 yValues.add(new PointValue(++countX, y));
                 AxisValue axisValue = new AxisValue(x);
                 axisValues.add(axisValue);
@@ -138,31 +107,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         List<Line> lines = new ArrayList<>();
         Line line = new Line(yValues);
         line.setColor(ChartUtils.COLORS[0]);
-        line.setShape(shape);
-        line.setCubic(isCubic);
-        line.setFilled(isFilled);
-//        line.setHasLabels(false);
-        line.setHasLabelsOnlyForSelected(hasLabelForSelected);
-        line.setHasLines(hasLines);
+        line.setHasLines(true);
         line.setHasPoints(false);
         lines.add(line);
 
-        data = new LineChartData(lines);
+        LineChartData data = new LineChartData(lines);
         data.setAxisXBottom(new Axis(axisValues).setHasSeparationLine(false));
-//        data.setAxisXBottom(null);
         data.setAxisYLeft(null);
         data.setBaseValue(Float.NEGATIVE_INFINITY);
-
         chart.setLineChartData(data);
-//        resetViewport();
 
-        Log.d(DetailFragment.class.getSimpleName(), "generated data");
+//        Log.d(DetailFragment.class.getSimpleName(), "generated data");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-//        unbinder.unbind();
     }
 
     @Override

@@ -31,10 +31,10 @@ public class ConnectivityStatusReceiver extends BroadcastReceiver {
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         Log.d(TAG, String.format("action = %s, connected = %s", action, isConnected));
-        listener.status(isConnected);
+        listener.updateConnectivityStatus(isConnected);
     }
 
     public interface Listener {
-        void status(boolean connected);
+        void updateConnectivityStatus(boolean connected);
     }
 }
